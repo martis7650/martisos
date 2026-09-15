@@ -1,3 +1,9 @@
+"""
+MartisOS 
+Copyright (c) 2026 Martin Sláčala
+Licensed under the MIT License.
+"""
+
 import os
 import sys
 import json
@@ -17,8 +23,8 @@ class MartisOS:
 
     def load_memory(self):
         if not os.path.exists(self.memory_file) or os.path.getsize(self.memory_file) == 0:
-            print("=== PRVNÍ SPUŠTĚNÍ MARTISOS ===")
-            print("Vytvářím systémovou paměť (memory.txt)...")
+            print("=== First launch of MartisOS ===")
+            print("Creating memory system (memory.txt)...")
             username, password = self.setup_first_user()
             
             self.users = {username: password}
@@ -34,10 +40,10 @@ class MartisOS:
                 with open(self.memory_file, "r", encoding="utf-8") as f:
                     data = json.load(f)
                     self.users = data.get("users", {})
-                print("Paměť úspěšně načtena.")
+                print("Memory loaded.")
                 self.login_screen()
             except Exception as e:
-                print(f"Chyba při čtení memory.txt: {e}")
+                print(f"Eror, memory.txt: {e}")
                 sys.exit(1)
 
     def save_memory(self):
@@ -45,34 +51,34 @@ class MartisOS:
         try:
             with open(self.memory_file, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4)
-            print("[Systém] Paměť byla úspěšně uložena do memory.txt.")
+            print("[Systém] Memory saved to memory.txt.")
         except Exception as e:
-            print(f"[Chyba] Nepodařilo se uložit memory.txt: {e}")
+            print(f"[Chyba] Eror: memory not saved in memory.txt: {e}")
 
     def setup_first_user(self):
-        print("Vítej v MartisOS! Musíme vytvořit prvního administrátora.")
-        username = input("Zadej uživatelské jméno: ").strip()
+        print("Welcome to MartisOS, lets create first Administrator.")
+        username = input("Enter your username: ").strip()
         while not username:
-            username = input("Jméno nemůže být prázdné. Zadej uživatelské jméno: ").strip()
+            username = input("Invalid Username, try agin other name: ").strip()
             
-        password = input("Zadej heslo: ").strip()
+        password = input("Enter your password: ").strip()
         return username, password
 
     def login_screen(self):
-        print("\n=== PŘIHLÁŠENÍ DO MARTISOS ===")
+        print("\n=== LOG IN TO MARTIS OS ===")
         while True:
-            username = input("Uživatelské jméno: ").strip()
-            password = input("Heslo: ").strip()
+            username = input("User: ").strip()
+            password = input("Password: ").strip()
             
             if username in self.users and self.users[username] == password:
                 self.current_user = username
                 user_folder = os.path.join(self.root_dir, username)
                 os.makedirs(user_folder, exist_ok=True)
                 self.current_dir = f"/{username}"
-                print(f"Přihlášen jako {username}.\n")
+                print(f"Logged in as {username}.\n")
                 break
             else:
-                print("Chybné jméno nebo heslo. Zkus to znovu.\n")
+                print("Incorrect username or password. Try again.\n")
 
     def get_full_path(self, path_arg):
         if path_arg.startswith("/"):
@@ -93,7 +99,7 @@ class MartisOS:
                 try:
                     command_line = input(prompt).strip()
                 except (KeyboardInterrupt, EOFError):
-                    print("\nNucené přerušení, ukládám systém a končím...")
+                    print("\nForced interruption; saving system state and shutting down...")
                     self.save_memory()
                     break
 
@@ -105,9 +111,9 @@ class MartisOS:
                 args = parts[1:]
 
                 if cmd == "exit":
-                    print("Ukládám systémová data do memory.txt...")
+                    print("Saving data")
                     self.save_memory()
-                    print("Vypínám MartisOS. Sbohem!")
+                    print("Shutting down MartisOS. Goodbye!")
                     break
                 elif cmd == "help":
                     self.cmd_help()
@@ -121,32 +127,32 @@ class MartisOS:
                     if args:
                         self.cmd_mkdir(args[0])
                     else:
-                        print("Použití: mkdir <název_složky>")
+                        print("Usage: mkdir <folder_name>")
                 elif cmd == "cat":
                     if args:
                         self.cmd_cat(args[0])
                     else:
-                        print("Použití: cat <soubor>")
+                        print("Usage: nano <file>")
                 elif cmd == "nano":
                     if args:
                         self.cmd_nano(args[0])
                     else:
-                        print("Použití: nano <soubor>")
+                        print("Usage: nano <file>")
                 elif cmd == "cp":
                     if len(args) >= 2:
                         self.cmd_cp(args[0], args[1])
                     else:
-                        print("Použití: cp <zdroj> <cíl>")
+                        print("Usage: cp <source> <target>")
                 elif cmd == "mv":
                     if len(args) >= 2:
                         self.cmd_mv(args[0], args[1])
                     else:
-                        print("Použití: mv <zdroj> <cíl>")
+                        print("Usage: mv <source> <target>")
                 elif cmd == "rm":
                     if args:
                         self.cmd_rm(args[0])
                     else:
-                        print("Použití: rm <soubor_nebo_složka>")
+                        print("Usage: rm <file or folder>")
                 elif cmd == "clear":
                     os.system('cls' if os.name == 'nt' else 'clear')
                 elif cmd == "addusr":
@@ -157,40 +163,40 @@ class MartisOS:
                     if len(args) >= 2 and args[0] == "install":
                         self.cmd_apt_install(args[1])
                     else:
-                        print("Použití: apt install <nazev_balicku>")
+                        print("Usage: apt install <package name>")
                 elif cmd == "pm":
                     self.cmd_pymartis(args)
                 else:
-                    print(f"Neznámý příkaz: {cmd}. Napiš 'help' pro nápovědu.")
+                    print(f"Unknown command: {cmd}. Type 'help' for assistance.")
         except Exception as e:
-            print(f"Neočekávaná chyba v běhu systému: {e}")
+            print(f"Unexpected system runtime error: {e}")
             self.save_memory()
 
     def cmd_help(self):
-        print("Dostupné příkazy v MartisOS:")
-        print("  help                    - Zobrazí nápovědu")
-        print("  ls                      - Vypíše obsah aktuálního adresáře")
-        print("  pwd                     - Zobrazí aktuální cestu")
-        print("  cd <složka>             - Změní adresář (.. pro návrat)")
-        print("  mkdir <složka>          - Vytvoří novou složku")
-        print("  cat <soubor>            - Zobrazí obsah souboru")
-        print("  nano <soubor>           - Vytvoří nebo upraví soubor")
-        print("  cp <zdroj> <cíl>        - Zkopíruje soubor")
-        print("  mv <zdroj> <cíl>        - Přesune nebo přejmenuje soubor")
-        print("  rm <cesta>              - Smaže soubor nebo prázdnou složku")
-        print("  clear                   - Vymaže obrazovku")
-        print("  addusr                  - Přidá nového uživatele")
-        print("  dluser                  - Smaže uživatele")
-        print("  apt install <balíček>   - Stáhne aplikaci z repozitáře")
-        print("  pm <příkaz>             - Práce s PyMartis kódem (mk, nano, run)")
-        print("  exit                    - Uloží data a vypne MartisOS")
+        print("Available commands in MartisOS:")
+        print("  help                    - Displays help")
+        print("  ls                      - Lists the contents of the current directory.")
+        print("  pwd                     - Displays the current path")
+        print("  cd <folder>             - Changes the directory (.. to go back)")
+        print("  mkdir <folder>          - Creates a new folder")
+        print("  cat <file>              - Displays the contents of the file")
+        print("  nano <file>             - Vytvoří nebo upraví soubor")
+        print("  cp <source> <target>    - Copies file")
+        print("  mv <source> <target>    - Move or renames file or folder")
+        print("  rm <file or folder>     - Deletes a file or an empty folder.")
+        print("  clear                   - Clear screen")
+        print("  addusr                  - Adds a new user")
+        print("  dluser                  - Deletes the user")
+        print("  apt install <package>   - Downloads the application from the repository.")
+        print("  pm <command>            - Working with PyMartis code (mk, nano, run)")
+        print("  exit                    - Saves data and shuts down MartisOS.")
 
     def cmd_ls(self):
         real_path = self.get_full_path("")
         if os.path.exists(real_path):
             print("  ".join(os.listdir(real_path)))
         else:
-            print("Chyba: Adresář neexistuje.")
+            print("Error: Directory does not exist.")
 
     def cmd_pwd(self):
         print(self.current_dir)
@@ -210,14 +216,14 @@ class MartisOS:
         if os.path.exists(real_path) and os.path.isdir(real_path):
             self.current_dir = new_virt_path
         else:
-            print(f"Chyba: Složka '{path}' nebyla nalezena.")
+            print(f"Error: Folder '{path}' was not found.")
 
     def cmd_mkdir(self, dirname):
         try:
             os.makedirs(self.get_full_path(dirname), exist_ok=True)
-            print(f"Složka '{dirname}' byla vytvořena.")
+            print(f"Folder '{dirname}' was created.")
         except Exception as e:
-            print(f"Chyba při vytváření složky: {e}")
+            print(f"Error creating folder: {e}")
 
     def cmd_cat(self, filename):
         real_path = self.get_full_path(filename)
@@ -225,12 +231,12 @@ class MartisOS:
             with open(real_path, "r", encoding="utf-8") as f:
                 print(f.read())
         else:
-            print(f"Chyba: Soubor '{filename}' nebyl nalezen.")
+            print(f"Error: File '{filename}' was not found.")
 
     def cmd_nano(self, filename):
         real_path = self.get_full_path(filename)
-        print(f"--- Editor Nano (upravuješ: {filename}) ---")
-        print("Zadej text. Na novém řádku napiš ':wq' pro uložení a ukončení, nebo ':q' pro zrušení.")
+        print(f"--- Editor Nano (you are adjusting: {filename}) ---")
+        print("Enter text. On a new line, type ':wq' to save and exit, or ':q' to cancel.")
         
         existing_content = ""
         if os.path.exists(real_path) and os.path.isfile(real_path):
@@ -244,10 +250,10 @@ class MartisOS:
             if line == ":wq":
                 with open(real_path, "w", encoding="utf-8") as f:
                     f.write("\n".join(lines) + ("\n" if lines else ""))
-                print(f"Soubor '{filename}' byl uložen.")
+                print(f"File '{filename}' was imposed.")
                 break
             elif line == ":q":
-                print("Zrušeno bez uložení.")
+                print("Dismissed without imposition of penalty.")
                 break
             else:
                 lines.append(line)
@@ -255,92 +261,92 @@ class MartisOS:
     def cmd_cp(self, src, dest):
         real_src, real_dest = self.get_full_path(src), self.get_full_path(dest)
         if not os.path.exists(real_src):
-            print(f"Chyba: Zdroj '{src}' neexistuje.")
+            print(f"Error: Source '{src}' does not exist.")
             return
         try:
             if os.path.isdir(real_src):
                 shutil.copytree(real_src, real_dest, dirs_exist_ok=True)
             else:
                 shutil.copy(real_src, real_dest)
-            print(f"Úspěšně zkopírováno.")
+            print(f"Successfully copied.")
         except Exception as e:
-            print(f"Chyba při kopírování: {e}")
+            print(f"Error while copying: {e}")
 
     def cmd_mv(self, src, dest):
         real_src, real_dest = self.get_full_path(src), self.get_full_path(dest)
         if not os.path.exists(real_src):
-            print(f"Chyba: Zdroj '{src}' neexistuje.")
+            print(f"Error: Source '{src}' does not exist.")
             return
         try:
             shutil.move(real_src, real_dest)
-            print("Úspěšně přesunuto.")
+            print("Successfully moved.")
         except Exception as e:
-            print(f"Chyba při přesouvání: {e}")
+            print(f"Error while moving: {e}")
 
     def cmd_rm(self, target):
         real_path = self.get_full_path(target)
         if not os.path.exists(real_path):
-            print(f"Chyba: Položka '{target}' neexistuje.")
+            print(f"Error: Item '{target}' does not exist.")
             return
         if os.path.isfile(real_path):
             os.remove(real_path)
-            print(f"Soubor '{target}' smazán.")
+            print(f"File '{target}' deleted.")
         elif os.path.isdir(real_path):
             try:
                 os.rmdir(real_path)
-                print(f"Složka '{target}' smazána.")
+                print(f"Folder '{target}' deleted.")
             except OSError:
-                print("Chyba: Složka není prázdná.")
+                print("Error: The folder is not empty.")
 
     def cmd_addusr(self):
-        print("--- Přidání nového uživatele ---")
-        new_user = input("Zadej jméno nového uživatele: ").strip()
+        print("--- Adding a new user ---")
+        new_user = input("Enter the new user's name: ").strip()
         if not new_user or new_user in self.users:
-            print("Neplatné nebo již existující jméno.")
+            print("Invalid or already existing name.")
             return
         self.users[new_user] = input("Zadej heslo: ").strip()
         os.makedirs(os.path.join(self.root_dir, new_user), exist_ok=True)
-        print(f"Uživatel '{new_user}' vytvořen.")
+        print(f"User '{new_user}' crated.")
 
     def cmd_dluser(self):
         if len(self.users) <= 1:
-            print("Chyba: Nelze smazat posledního uživatele!")
+            print("Error: Cannot delete the last user!")
             return
-        target = input("Zadej uživatele ke smazání: ").strip()
+        target = input("Enter the user to delete: ").strip()
         if target not in self.users:
-            print("Uživatel nenalezen.")
+            print("User was not found.")
             return
         del self.users[target]
-        print(f"Uživatel '{target}' smazán.")
+        print(f"User '{target}' deleted.")
 
     def cmd_apt_install(self, package_name):
         repo_index_url = "https://raw.githubusercontent.com/martis7650/martisos/refs/heads/main/packages1.json"
         
-        if repo_index_url == "hrabe?":
-            print("Chyba: V kódu MartisOS není nastaven repozitář (repo_index_url).")
+        if repo_index_url == "ignore_this":
+            print("Error: repository was not found (repo_index_url).")
             return
 
-        print(f"Hledám balíček '{package_name}' v repozitáři...")
+        print(f"Searching for package '{package_name}' in the repository...")
         try:
             with urllib.request.urlopen(repo_index_url) as response:
                 index_data = json.loads(response.read().decode('utf-8'))
             
             if package_name not in index_data:
-                print(f"Chyba: Balíček '{package_name}' nebyl nalezen.")
+                print(f"Error: Package '{package_name}' was not found.")
                 return
             
             script_url = index_data[package_name]
             filename = script_url.split("/")[-1]
             real_path = self.get_full_path(filename)
             
-            print(f"Stahuji '{package_name}'...")
+            print(f"Downloading '{package_name}'...")
             urllib.request.urlretrieve(script_url, real_path)
-            print(f"Balíček '{package_name}' úspěšně nainstalován!")
+            print(f"Package '{package_name}' successfully installed!")
         except Exception as e:
-            print(f"Chyba při stahování balíčku: {e}")
+            print(f"Error downloading package: {e}")
 
     # ==========================================
-    # PYTHONOVSKÝ INTERPRET (PyMartis - pm)
+    # PYTHON INTERPRET (PyMartis - pm)
     # ==========================================
 
     def _eval_expr(self, expr, variables):
@@ -453,7 +459,7 @@ class MartisOS:
                 i = next_i
                 continue
 
-            # BĚŽNÉ PŘÍKAZY
+            # BASIC COMMANDS
             if line.startswith("print(") and line.endswith(")"):
                 val = self._eval_expr(line[6:-1], variables)
                 print(val)
@@ -473,30 +479,30 @@ class MartisOS:
                 else:
                     variables[var_name] = self._eval_expr(expr, variables)
             else:
-                print(f"[PyMartis Chyba] Nerozpoznaný příkaz: {line}")
+                print(f"[PyMartis Error] Unrecognized command: {line}")
             
             i += 1
 
     def cmd_pymartis(self, args):
         if not args:
-            print("Použití: pm <mk|nano|run> <název_skriptu.pm>")
+            print("Usage: pm <mk|nano|run> <script_name.pm>")
             return
 
         sub_cmd, sub_args = args[0], args[1:]
 
         if sub_cmd == "mk":
             if not sub_args:
-                print("Použití: pm mk <nazev.pm>")
+                print("Usage: pm mk <name.pm>")
                 return
             filename = sub_args[0]
             if not filename.endswith(".pm"): filename += ".pm"
             with open(self.get_full_path(filename), "w", encoding="utf-8") as f:
-                f.write("# PyMartis skript\n")
-            print(f"Vytvořen soubor: {filename}")
+                f.write("# PyMartis script\n")
+            print(f"Created file: {filename}")
 
         elif sub_cmd == "nano":
             if not sub_args:
-                print("Použití: pm nano <nazev.pm>")
+                print("Usage: pm nano <name.pm>")
                 return
             filename = sub_args[0]
             if not filename.endswith(".pm") and "." not in filename:
@@ -505,7 +511,7 @@ class MartisOS:
 
         elif sub_cmd == "run":
             if not sub_args:
-                print("Použití: pm run <nazev.pm>")
+                print("Usage: pm run <name.pm>")
                 return
             filename = sub_args[0]
             if not filename.endswith(".pm") and "." not in filename:
@@ -513,18 +519,18 @@ class MartisOS:
             real_path = self.get_full_path(filename)
             
             if not os.path.exists(real_path):
-                print(f"Chyba: Skript '{filename}' nenalezen.")
+                print(f"Error: Script '{filename}' was not found.")
                 return
                 
-            print(f"--- Spouštím PyMartis skript: {filename} ---")
+            print(f"--- Launching PyMartis script: {filename} ---")
             with open(real_path, "r", encoding="utf-8") as f:
                 code_lines = [line.rstrip('\n') for line in f.readlines()]
                 
             variables = {}
             self._execute_block(code_lines, variables)
-            print("--- Konec skriptu ---")
+            print("--- End of Script ---")
         else:
-            print(f"Neznámý podřízený příkaz pro pm: {sub_cmd}")
+            print(f"Unknown subcommand for pm: {sub_cmd}")
 
 if __name__ == "__main__":
     OS = MartisOS()
