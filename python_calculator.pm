@@ -42,6 +42,6 @@ while bezi == 1:
                 print("Výsledek dělení je:")
                 print(vysledek)
         else:
-            print("Neplatná volba operace.")
+            print("Neplatná volba operace. ")
 
 print("Díky, že jsi využil PyMartis kalkulačku.")
