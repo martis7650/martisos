@@ -1,3 +1,9 @@
+"""
+MartisOS
+Copyright (c) 2026 Martin Sláčala
+Licensed under the MIT License.
+"""
+
 import os
 import sys
 import json
